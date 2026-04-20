@@ -57,10 +57,26 @@ async function readArrayDoc<T>(kind: 'songs' | 'setlists'): Promise<T[]> {
   return Array.isArray(data.items) ? data.items : []
 }
 
+/** Firestore não aceita `undefined` em nenhum nível do payload. */
+function stripUndefinedDeep(value: unknown): unknown {
+  if (value === undefined) return undefined
+  if (value === null || typeof value !== 'object') return value
+  if (Array.isArray(value)) {
+    return value.map((item) => stripUndefinedDeep(item))
+  }
+  const out: Record<string, unknown> = {}
+  for (const [key, v] of Object.entries(value as Record<string, unknown>)) {
+    if (v === undefined) continue
+    out[key] = stripUndefinedDeep(v)
+  }
+  return out
+}
+
 async function writeArrayDoc<T>(kind: 'songs' | 'setlists', items: T[]): Promise<void> {
   const refs = getRefs()
   const ref = kind === 'songs' ? refs.songsDoc : refs.setlistsDoc
-  await setDoc(ref, { items, updatedAt: Date.now() }, { merge: true })
+  const safeItems = stripUndefinedDeep(items) as T[]
+  await setDoc(ref, { items: safeItems, updatedAt: Date.now() }, { merge: true })
 }
 
 export const firebaseAdapter: PersistenceAdapter = {
