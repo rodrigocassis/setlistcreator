@@ -1,0 +1,14 @@
+{
+  "showTitle": "Show de hoje",
+  "songs": [
+    { "id": "s1", "title": "Abertura / Check som", "note": "2 min" },
+    { "id": "s2", "title": "Música A", "artist": "Banda" },
+    { "id": "s3", "title": "Música B", "artist": "Banda" },
+    { "id": "s4", "title": "Música C", "artist": "Cover" },
+    { "id": "s5", "title": "Música D" },
+    { "id": "s6", "title": "Música E" },
+    { "id": "s7", "title": "Música F" },
+    { "id": "s8", "title": "Bis — Música G" },
+    { "id": "s9", "title": "Bis — Música H" }
+  ]
+}
