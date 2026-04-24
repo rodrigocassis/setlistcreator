@@ -1,5 +1,14 @@
 import type { ReactNode } from 'react'
 import type { Song } from '../../types/models'
+import avatarAbel from '../../assets/avatar-abel.png'
+import avatarMarquinho from '../../assets/avatar-marquinho.png'
+import avatarNuma from '../../assets/avatar-numa.png'
+import avatarRodrigo from '../../assets/avatar-rodrigo.png'
+import iconBaixo from '../../assets/icon-baixo.png'
+import iconBateria from '../../assets/icon-bateria.png'
+import iconGuitarra1 from '../../assets/icon-guitarra.png'
+import iconGuitarra2 from '../../assets/icon-guitarra-2.png'
+import iconViolao from '../../assets/icon-violao.png'
 import { FORMATION_KEYS, type FormationKey } from '../../utils/setlistTransitions'
 
 function partActive(s: string | undefined): boolean {
@@ -8,20 +17,52 @@ function partActive(s: string | undefined): boolean {
   return true
 }
 
-function playerInitials(name: string): string {
-  const t = name.trim()
-  if (!t) return '?'
-  const parts = t.split(/\s+/).filter(Boolean)
-  if (parts.length >= 2) {
-    return (parts[0]![0]! + parts[1]![0]!).toUpperCase()
-  }
-  return t.length <= 2 ? t.toUpperCase() : t.slice(0, 2).toUpperCase()
-}
-
 function playerHue(name: string): number {
   let h = 0
   for (let i = 0; i < name.length; i += 1) h = (h * 33 + name.charCodeAt(i)) | 0
   return Math.abs(h) % 360
+}
+
+function firstNameToken(name: string): string {
+  return name.trim().toLowerCase().split(/\s+/)[0] ?? ''
+}
+
+/** Nome do músico no cadastro (voz, instrumento, etc.) — bate com primeiro token. */
+function isAbelMention(name: string): boolean {
+  const t = name.trim().toLowerCase()
+  if (!t) return false
+  if (t === 'abel') return true
+  return firstNameToken(name) === 'abel'
+}
+
+function isNumaMention(name: string): boolean {
+  const t = name.trim().toLowerCase()
+  if (!t) return false
+  if (t === 'numa') return true
+  return firstNameToken(name) === 'numa'
+}
+
+function isRodrigoMention(name: string): boolean {
+  const t = name.trim().toLowerCase()
+  if (!t) return false
+  if (t === 'rodrigo') return true
+  return firstNameToken(name) === 'rodrigo'
+}
+
+function isMarquinhoMention(name: string): boolean {
+  const t = name.trim().toLowerCase()
+  if (!t) return false
+  if (t === 'marquinho' || t === 'marcos') return true
+  const first = firstNameToken(name)
+  return first === 'marquinho' || first === 'marcos'
+}
+
+function avatarForPersonName(name: string): string | null {
+  if (isAbelMention(name)) return avatarAbel
+  if (isMarquinhoMention(name)) return avatarMarquinho
+  if (isNumaMention(name)) return avatarNuma
+  if (isRodrigoMention(name)) return avatarRodrigo
+  return null
 }
 
 function IconMic({ className }: { className?: string }) {
@@ -44,40 +85,45 @@ function IconMic({ className }: { className?: string }) {
   )
 }
 
-function IconViolao({ className }: { className?: string }) {
+/** Imagem fornecida pelo usuário — violão (formato alongado, cabe no chip). */
+function ImgViolao() {
   return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <path d="M8 21h8M12 3v1M7 6h10l-1 7a4 4 0 0 1-8 0L7 6z" />
-      <circle cx="12" cy="14" r="1.5" fill="currentColor" stroke="none" />
-    </svg>
+    <img
+      src={iconViolao}
+      alt=""
+      className="h-4 w-3.5 shrink-0 object-contain"
+      width={14}
+      height={16}
+      loading="lazy"
+      decoding="async"
+      draggable={false}
+    />
   )
 }
 
-function IconGuitarra({ className, suffix }: { className?: string; suffix: '1' | '2' }) {
+/**
+ * Guitarra 1: Strat; guitarra 2: ícone dedicado (teclado controlador no asset).
+ * Sufixo 1/2 no canto.
+ */
+function ImgGuitarra({ suffix }: { suffix: '1' | '2' }) {
+  const isG1 = suffix === '1'
+  const src = isG1 ? iconGuitarra1 : iconGuitarra2
   return (
-    <span className="relative inline-flex" aria-hidden>
-      <svg
-        className={className}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M7 20h10M9 4l-2 2 2 10h6l2-10-2-2" />
-        <path d="M9 6h6" />
-        <circle cx="12" cy="15" r="1.5" fill="currentColor" stroke="none" />
-      </svg>
+    <span className="relative inline-flex shrink-0" aria-hidden>
+      <img
+        src={src}
+        alt=""
+        className={
+          isG1
+            ? 'h-4 w-3.5 object-contain'
+            : 'h-3.5 w-[1.4rem] object-contain'
+        }
+        width={isG1 ? 14 : 22}
+        height={isG1 ? 16 : 14}
+        loading="lazy"
+        decoding="async"
+        draggable={false}
+      />
       <span className="absolute -bottom-0.5 -right-0.5 flex h-3 min-w-[10px] items-center justify-center rounded bg-zinc-900 px-0.5 text-[7px] font-bold leading-none text-violet-300">
         {suffix}
       </span>
@@ -85,56 +131,79 @@ function IconGuitarra({ className, suffix }: { className?: string; suffix: '1' |
   )
 }
 
-function IconBaixo({ className }: { className?: string }) {
+/** Imagem fornecida pelo usuário — baixo elétrico (sunburst). */
+function ImgBaixo() {
   return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <path d="M6 4h12v3H6z" />
-      <path d="M8 7v12a3 3 0 0 0 3 3h2a3 3 0 0 0 3-3V7" />
-      <path d="M9 10h6" />
-      <circle cx="12" cy="16" r="1" fill="currentColor" stroke="none" />
-    </svg>
+    <img
+      src={iconBaixo}
+      alt=""
+      className="h-4 w-3.5 shrink-0 object-contain"
+      width={14}
+      height={16}
+      loading="lazy"
+      decoding="async"
+      draggable={false}
+    />
   )
 }
 
-function IconBateria({ className }: { className?: string }) {
+/** Imagem fornecida pelo usuário — bateria (formato largo). */
+function ImgBateria() {
   return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <circle cx="8" cy="9" r="2.5" />
-      <circle cx="16" cy="9" r="2.5" />
-      <ellipse cx="12" cy="16" rx="4" ry="2.5" />
-      <path d="M12 12v2" />
-    </svg>
+    <img
+      src={iconBateria}
+      alt=""
+      className="h-3.5 w-[1.35rem] shrink-0 object-contain"
+      width={22}
+      height={14}
+      loading="lazy"
+      decoding="async"
+      draggable={false}
+    />
   )
 }
 
 function IconPessoa({ className, name }: { className?: string; name: string }) {
-  const bg = `hsl(${playerHue(name)} 42% 36%)`
+  const photo = avatarForPersonName(name)
+  if (photo) {
+    return (
+      <span
+        className={`inline-block h-4 w-4 shrink-0 overflow-hidden rounded-full ring-1 ring-zinc-600/60 ${className ?? ''}`}
+        title={name}
+      >
+        <img
+          src={photo}
+          alt=""
+          className="h-full w-full object-cover object-top"
+          width={16}
+          height={16}
+          loading="lazy"
+          decoding="async"
+          draggable={false}
+        />
+      </span>
+    )
+  }
+  const bg = `hsl(${playerHue(name)} 38% 40%)`
   return (
     <span
-      className={`inline-flex h-4 min-w-[1rem] shrink-0 items-center justify-center rounded-full px-0.5 text-[8px] font-bold leading-none text-white ring-1 ring-zinc-600/60 ${className ?? ''}`}
+      className={`inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full ring-1 ring-zinc-600/60 ${className ?? ''}`}
       style={{ backgroundColor: bg }}
       title={name}
-      aria-label={name}
     >
-      {playerInitials(name)}
+      <svg
+        className="h-2.5 w-2.5 text-white/95"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden
+      >
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
+      </svg>
     </span>
   )
 }
@@ -144,24 +213,24 @@ const SLOT: Record<
   { label: string; render: (cn: string) => ReactNode }
 > = {
   voz: { label: 'Voz', render: (cn) => <IconMic className={cn} /> },
-  violao: { label: 'Violão', render: (cn) => <IconViolao className={cn} /> },
+  violao: { label: 'Violão', render: () => <ImgViolao /> },
   guitarra1: {
     label: 'Guitarra 1',
-    render: (cn) => <IconGuitarra className={cn} suffix="1" />,
+    render: () => <ImgGuitarra suffix="1" />,
   },
   guitarra2: {
     label: 'Guitarra 2',
-    render: (cn) => <IconGuitarra className={cn} suffix="2" />,
+    render: () => <ImgGuitarra suffix="2" />,
   },
-  baixo: { label: 'Baixo', render: (cn) => <IconBaixo className={cn} /> },
-  bateria: { label: 'Bateria', render: (cn) => <IconBateria className={cn} /> },
+  baixo: { label: 'Baixo', render: () => <ImgBaixo /> },
+  bateria: { label: 'Bateria', render: () => <ImgBateria /> },
 }
 
 const iconCN = 'h-3.5 w-3.5 shrink-0 text-violet-300/95'
 
 type Props = {
   song: Song
-  /** Menos padding e texto em biblioteca compacta */
+  /** Menos padding em biblioteca compacta / overlay */
   dense?: boolean
   className?: string
 }
@@ -182,18 +251,16 @@ export function SongCardFormation({ song, dense, className }: Props) {
         return (
           <li
             key={k}
-            className={`inline-flex max-w-full items-center gap-1 rounded-md border border-zinc-600/70 bg-zinc-950/50 ${dense ? 'px-1 py-0.5' : 'px-1.5 py-0.5'}`}
+            className={`inline-flex items-center gap-1 rounded-md border border-zinc-600/70 bg-zinc-950/50 ${dense ? 'px-1 py-0.5' : 'px-1.5 py-0.5'}`}
             title={`${label}: ${name}`}
           >
-            <span className="text-zinc-500" title={label}>
+            <span className="text-zinc-500" aria-hidden>
               {render(iconCN)}
             </span>
+            <span className="sr-only">
+              {label}: {name}
+            </span>
             <IconPessoa name={name} />
-            {!dense ? (
-              <span className="max-w-[3.5rem] truncate text-[9px] font-medium text-zinc-400 sm:max-w-[5rem]">
-                {name}
-              </span>
-            ) : null}
           </li>
         )
       })}
