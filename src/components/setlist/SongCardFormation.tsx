@@ -1,13 +1,4 @@
 import type { Song } from '../../types/models'
-import avatarAbel from '../../assets/avatar-abel.png'
-import avatarMarquinho from '../../assets/avatar-marquinho.png'
-import avatarNuma from '../../assets/avatar-numa.png'
-import avatarRodrigo from '../../assets/avatar-rodrigo.png'
-import iconBaixo from '../../assets/icon-baixo.png'
-import iconBateria from '../../assets/icon-bateria.png'
-import iconGuitarra1 from '../../assets/icon-guitarra.png'
-import iconGuitarra2 from '../../assets/icon-guitarra-2.png'
-import iconViolao from '../../assets/icon-violao.png'
 
 type SlotKey = 'voz' | 'violao' | 'guitarra1' | 'guitarra2' | 'baixo' | 'bateria'
 
@@ -16,19 +7,6 @@ const SLOT_ORDER: SlotKey[] = ['voz', 'violao', 'guitarra1', 'guitarra2', 'baixo
 function hasPlayer(value: string | undefined): boolean {
   const t = (value ?? '').trim().toLowerCase()
   return Boolean(t && t !== '-' && t !== 'n/a')
-}
-
-function firstToken(name: string): string {
-  return name.trim().toLowerCase().split(/\s+/)[0] ?? ''
-}
-
-function avatarForName(name: string): string | null {
-  const t = firstToken(name)
-  if (t === 'abel') return avatarAbel
-  if (t === 'numa') return avatarNuma
-  if (t === 'rodrigo') return avatarRodrigo
-  if (t === 'marcos' || t === 'marquinho') return avatarMarquinho
-  return null
 }
 
 function IconMic() {
@@ -51,42 +29,81 @@ function IconMic() {
   )
 }
 
-function InstrumentIcon({ slot }: { slot: SlotKey }) {
-  if (slot === 'voz') return <IconMic />
-  if (slot === 'violao') return <img src={iconViolao} alt="" className="h-4 w-3.5 object-contain" />
-  if (slot === 'guitarra1') return <img src={iconGuitarra1} alt="" className="h-4 w-3.5 object-contain" />
-  if (slot === 'guitarra2') return <img src={iconGuitarra2} alt="" className="h-3.5 w-[1.4rem] object-contain" />
-  if (slot === 'baixo') return <img src={iconBaixo} alt="" className="h-4 w-3.5 object-contain" />
-  return <img src={iconBateria} alt="" className="h-3.5 w-[1.35rem] object-contain" />
+function IconViolao() {
+  return (
+    <svg className="h-3.5 w-3.5 text-violet-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+      <path d="M8 21h8M12 3v1M7 6h10l-1 7a4 4 0 0 1-8 0L7 6z" />
+      <circle cx="12" cy="14" r="1.5" fill="currentColor" stroke="none" />
+    </svg>
+  )
 }
 
-function PersonIcon({ name }: { name: string }) {
-  const avatar = avatarForName(name)
-  if (avatar) {
-    return (
-      <span className="inline-block h-4 w-4 overflow-hidden rounded-full ring-1 ring-zinc-600/70" title={name}>
-        <img src={avatar} alt="" className="h-full w-full object-cover object-top" />
-      </span>
-    )
-  }
+function IconGuitarra({ suffix }: { suffix: '1' | '2' }) {
   return (
-    <span
-      className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-zinc-700 ring-1 ring-zinc-600/70"
-      title={name}
-    >
+    <span className="relative inline-flex" aria-hidden>
       <svg
-        className="h-2.5 w-2.5 text-white/95"
+        className="h-3.5 w-3.5 text-violet-300"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        aria-hidden
       >
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-        <circle cx="12" cy="7" r="4" />
+        <path d="M7 20h10M9 4l-2 2 2 10h6l2-10-2-2" />
+        <path d="M9 6h6" />
+        <circle cx="12" cy="15" r="1.5" fill="currentColor" stroke="none" />
       </svg>
+      <span className="absolute -bottom-0.5 -right-0.5 flex h-3 min-w-[10px] items-center justify-center rounded bg-zinc-900 px-0.5 text-[7px] font-bold leading-none text-violet-300">
+        {suffix}
+      </span>
+    </span>
+  )
+}
+
+function IconBaixo() {
+  return (
+    <svg className="h-3.5 w-3.5 text-violet-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+      <path d="M6 4h12v3H6z" />
+      <path d="M8 7v12a3 3 0 0 0 3 3h2a3 3 0 0 0 3-3V7" />
+      <path d="M9 10h6" />
+      <circle cx="12" cy="16" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
+function IconBateria() {
+  return (
+    <svg className="h-3.5 w-3.5 text-violet-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+      <circle cx="8" cy="9" r="2.5" />
+      <circle cx="16" cy="9" r="2.5" />
+      <ellipse cx="12" cy="16" rx="4" ry="2.5" />
+      <path d="M12 12v2" />
+    </svg>
+  )
+}
+
+function InstrumentIcon({ slot }: { slot: SlotKey }) {
+  if (slot === 'voz') return <IconMic />
+  if (slot === 'violao') return <IconViolao />
+  if (slot === 'guitarra1') return <IconGuitarra suffix="1" />
+  if (slot === 'guitarra2') return <IconGuitarra suffix="2" />
+  if (slot === 'baixo') return <IconBaixo />
+  return <IconBateria />
+}
+
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 0) return '?'
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+  return `${parts[0][0] ?? ''}${parts[1][0] ?? ''}`.toUpperCase()
+}
+
+function PersonIcon({ name }: { name: string }) {
+  const t = name.trim()
+  return (
+    <span className="inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-zinc-700 px-0.5 text-[8px] font-bold text-white ring-1 ring-zinc-600/70" title={t}>
+      {initials(t)}
     </span>
   )
 }
