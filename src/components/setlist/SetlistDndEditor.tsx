@@ -27,7 +27,6 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import type { Setlist, Song } from '../../types/models'
-import { SongCardFormation } from './SongCardFormation'
 import { songPalcoLabel } from '../../utils/songDisplay'
 import {
   countFormationChanges,
@@ -150,7 +149,6 @@ function LibraryDraggableCard({
           {songPalcoLabel(song)}
         </div>
         <div className="text-xs text-zinc-400">{song.artista}</div>
-        <SongCardFormation song={song} dense={!!compact} />
         {!compact ? (
           <div className="mt-0.5 text-[11px] text-zinc-500">
             {song.afinacao} · {song.estilo}
@@ -208,7 +206,6 @@ function SortableSongCard({
         >
           <div className="font-medium text-zinc-100">{songPalcoLabel(song)}</div>
           <div className="text-sm text-zinc-400">{song.artista}</div>
-          <SongCardFormation song={song} dense={!!compact} />
           {!compact ? (
             <div className="mt-0.5 text-xs text-zinc-500">
               {song.afinacao} · {song.estilo}
@@ -679,7 +676,6 @@ export function SetlistDndEditor({
           <div className="max-w-sm rounded-xl border-2 border-violet-500 bg-zinc-900 p-3 shadow-2xl">
             <div className="font-medium text-white">{songPalcoLabel(activeSong)}</div>
             <div className="text-sm text-zinc-400">{activeSong.artista}</div>
-            <SongCardFormation song={activeSong} dense />
           </div>
         ) : null}
       </DragOverlay>
